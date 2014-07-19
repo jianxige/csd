@@ -26,11 +26,30 @@ function start(response) {
 }
 
 function upload(response, request) {
-  console.log("Request handler 'upload' was called.");
+  //console.log("Request handler 'upload' was called.");
 
-  console.log(__dirname);
+  //console.log(fs.lstatSync(__dirname + "/upload"));
 
   var form = new formidable.IncomingForm();
+
+  var stat = fs.lstatSync(__dirname + "/upload");
+  var img = fs.lstatSync(__dirname + "/upload/test.png");
+  //console.log(img.isDirectory());
+  /*if(!img.isDirectory()) {
+      console.log(img.isDirectory());
+      response.writeHead(302, {
+     'Location': '/'
+    //add other headers here...
+  });
+  response.end();
+  return;
+  }*/
+  if(!stat.isDirectory()) {
+  //console.log(stat.isDirectory());
+    
+    fs.mkdirSync(__dirname + "/upload")
+  }
+  
 
   form.encoding = 'utf-8';
 
@@ -39,7 +58,15 @@ function upload(response, request) {
   //console.log("about to parse");
   form.parse(request, function(error, fields, files) {
     //console.log("parsing done");
-
+    if(!files.upload)
+    {
+        response.writeHead(302, {
+       'Location': '/'
+      //add other headers here...
+      });
+      response.end();
+      return;
+    }
     fs.renameSync(files.upload.path, __dirname + "/upload/test.png");
     // fs.rename(files.upload.path, __dirname + "/upload/test.png", function(err) {
     //   if (err) {
